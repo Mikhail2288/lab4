@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Main {
     public static <T> void printBoxContents(Box<T> box) {
@@ -16,7 +17,7 @@ public class Main {
             out.println("Ошибка: " + e.getMessage());
         }
     }
-    //статический метод, который принимает Список элементов типа Т и определяет функцию преобразования каждого элемента входного списка
+    //статический метод, который принимает Список элементов типа Т и функцию преобразования каждого элемента входного списка
     public static <T, R> List<R> transformList(List<T> inputList, Function<T, R> function) {
         List<R> result = new ArrayList<>();//пустой список ArrayList типа R, в которой будут храниться результаты преобразования.
         for (T item : inputList) {
@@ -24,6 +25,16 @@ public class Main {
                 result.add(function.apply(item));//принимает один аргумент типа T и возвращает результат типа R, то есть применение функции к аргументу.
             } catch (RuntimeException e) {
                 System.err.println("Ошибка при применении функции к элементу: " + item + ", причина: " + e.getMessage());
+            }
+        }
+        return result;
+    }
+    //статический метод, который принимает Список элементов типа Т и предикат
+    public static <T> List<T> filterList(List<T> inputList, Predicate<T> predicate) {
+        List<T> result = new ArrayList<>();
+        for (T item : inputList) {
+            if (predicate.test(item)) {//для каждого элемента вызывается метод test() предиката.
+                result.add(item);//Если test() возвращает true  то элемент добавляется в результирующий список.
             }
         }
         return result;
@@ -80,5 +91,33 @@ public class Main {
         );
         List<Integer> maxValues = transformList(intArrays, arr -> Arrays.stream(arr).max().orElse(0));//лямбда-выражение
         out.println("Максимальные значения: " + maxValues);
+        
+        out.println("3.2");
+        
+        //Фильтрация строк по длине
+        List<String> strings2 = List.of("qwerty", "asdfg", "zx", "abc", "a");
+        List<String> filteredStrings2 = filterList(strings2, str -> str.length() >= 3);//лямбда-выражение, которое определяет предикат
+        out.println("Отфильтрованные строки: " + filteredStrings2);
+
+        //Фильтрация чисел по знаку
+        List<Integer> numbers2 = List.of(1, -3, 7, -5, 0, 2);
+        List<Integer> filteredNumbers2 = filterList(numbers2, n -> n <= 0);//лямбда-выражение, определяющее предикат
+        out.println("Отфильтрованные числа: " + filteredNumbers2);
+
+        //Фильтрация массивов по отрицательным числам
+        List<int[]> intArrays2 = List.of(
+                new int[]{-1, -2, -3},
+                new int[]{3, -1, 7, 4},
+                new int[]{-9, -2, -6, -1},
+				new int[]{1, 2, 3}  // добавлен массив с положительными числами
+        );
+        List<int[]> filteredArrays2 = filterList(intArrays2, arr -> Arrays.stream(arr).allMatch(n -> n < 0));//Предикат для фильтрации. Он принимает массив целых чисел (arr) и проверяет, являются ли все элементы массива отрицательными.
+        out.print("Отфильтрованные массивы: ");
+        for (int i = 0; i < filteredArrays2.size(); i++) {
+            out.print(Arrays.toString(filteredArrays2.get(i)));
+            if (i < filteredArrays2.size() - 1) {
+                out.print(", ");
+            }
+        }
+
     }
-}
