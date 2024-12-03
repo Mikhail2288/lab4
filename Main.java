@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.BiFunction;
 
 public class Main {
     public static <T> void printBoxContents(Box<T> box) {
@@ -39,6 +40,18 @@ public class Main {
         }
         return result;
     }
+    //статический метод, который принимает Список элементов типа Т, Функциональный интерфейс BinaryOperator<T> и начальное значение результирующей переменной
+    public static <T, R> R reduceList(List<T> inputList, BiFunction<R, T, R> accumulator, R initialValue) {
+        if (inputList == null || inputList.isEmpty()) {//Обработка пустого списка
+            return initialValue; // Возвращаем начальное значение при пустом списке
+        }
+
+        R result = initialValue; // Начальное значение
+        for (T item : inputList) {
+            result = accumulator.apply(result, item); //применяет заданную операцию accumulator к текущему значению result и элементу item
+        }
+        return result;
+    }
 
 
     public static void main(String[] args) {
@@ -56,7 +69,7 @@ public class Main {
 
         out.println("2.2");
         Box<Integer> intBox = new Box<>();
-        intBox.put(3);
+        intBox.put(9);
 
         Box<Double> doubleBox = new Box<>();
         doubleBox.put(3.14);
@@ -119,5 +132,26 @@ public class Main {
                 out.print(", ");
             }
         }
+        
+        out.println("3.3");
+        //Объединение строк
+        List<String> strings3 = List.of("qwerty", "asdfg", "zx");
+        String concatenatedString3 = reduceList(strings3, (a, b) -> a + b, ""); //лямбда-выражение, которое определяет операцию редукции
+        out.println("Объединенная строка: " + concatenatedString3);
 
+        //Сумма чисел
+        List<Integer> numbers3 = List.of(1, -3, 7);
+        Integer sum3 = reduceList(numbers3, Integer::sum, 0);//ссылка на метод sum класса Integer
+        out.println("Сумма чисел: " + sum3);
+
+        //Общее количество элементов в списках
+        List<List<Integer>> listOfLists3 = List.of(
+                List.of(1, 2, 3),
+                List.of(4, 5),
+                List.of(6, 7, 8,9)
+        );
+		
+        Integer totalElements3 = reduceList(listOfLists3, (a, b) -> a + b.size(), 0);//Лямбда-выражение. Оно принимает целое число a (аккумулированная сумма) и список целых чисел b. Вычисляет размер списка b с помощью b.size() и добавляет его к a.
+        System.out.println("Общее количество элементов: " + totalElements3);
     }
+}
